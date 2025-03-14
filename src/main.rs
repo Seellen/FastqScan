@@ -1,36 +1,22 @@
-#[cfg(test)]
-mod test {
+use std::io;
+mod phred; 
 
-    use super::calculate_phred;
-    
-    #[test]
-    fn test_calculate_phred() {
-        let qual: char = '&';
-        let expected:usize =	5; // Phred-Score für das Zeichen '&'
-        let res = calculate_phred(qual);
-        assert_eq!(expected, res);
-    }
 
-    // Alternativ können viele Ergebnisse auf einmal getestet werden:
-    #[test]
-    fn test_calculate_phred_other() {
-        let tests: Vec<(char, usize)> = vec![
-            ('&', 5),
-            ('+', 10)
-        ];
-        for test in tests {
-            let res = calculate_phred(test.0);
-            assert_eq!(test.1, res);
-        }
-    }
-    // ggf. andere Testfunktionen
-}
 
 fn main() {
-    println!("Hello, world!");
-}
+    println!("Please input ur Phred seq:");
 
-pub fn calculate_phred(qual: char) -> u8 {
-    let phsc = qual as u8;
-    phsc - 33
+    let mut phred_seq = String::new();
+
+    io::stdin()
+        .read_line(&mut phred_seq)
+        .expect("Failed to read line");
+
+    phred_seq = phred_seq.trim().to_string();
+
+    match phred::avg_qual(&phred_seq) {
+        Some(avg) => println!("The average Phred Score of your sequence is: {avg}"),
+        None => println!("Invalid Char found in String"),
+    }
+
 }
