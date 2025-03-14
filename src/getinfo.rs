@@ -1,5 +1,8 @@
 use regex::Regex;
 
+const DATA_PATTERN: &str = r"[_\.]";
+const READ_PATTERN: &str = r"[ :\.]";
+
 #[derive(Debug)]
 struct DataInfo{
     sample_name: String,
@@ -109,7 +112,7 @@ impl ReadInfo {
 
 pub fn info_data(data: &mut String){
 
-    match split_data(data, r"[_\.]") {
+    match split_data(data, DATA_PATTERN) {
         Ok(info) => {
             match DataInfo::new(info) {
                 Ok(datainfo) => datainfo.display(),
@@ -124,7 +127,7 @@ pub fn info_data(data: &mut String){
 pub fn info_read(data: &mut String){
 
     // We split our Read into its parts
-    match split_data(data, r"[ :\.]") {
+    match split_data(data, READ_PATTERN) {
         Ok(info) => {
             match ReadInfo::new(info) {
                 Ok(read_info) => read_info.display(),
