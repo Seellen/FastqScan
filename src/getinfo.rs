@@ -21,10 +21,12 @@ impl DataInfo {
             return Err("Data is missing Information".to_string());
         }
 
+        // check for conversion errors
         let lane_number = info[2][1..].parse::<usize>().map_err(|_| "Failed to parse lane_number")?;
         let read_number = info[3][1..].parse::<usize>().map_err(|_| "Failed to parse read_number")?;
         let set_number = info[4].parse::<usize>().map_err(|_| "Failed to parse set_number")?;
 
+        // put info into new struct
         Ok(DataInfo{
             sample_name : info[0].to_string(),
             barcode_sequence: info[1].to_string(),
@@ -69,6 +71,7 @@ impl ReadInfo {
             return Err("Data is missing Information".to_string());
         }
 
+        // Check for conversion errors
         let run = info[1].parse::<usize>().map_err(|_| "Failed to parse lane_number")?;
         let lane = info[3].parse::<usize>().map_err(|_| "Failed to parse read_number")?;
         let tile_number = info[4].parse::<usize>().map_err(|_| "Failed to parse set_number")?;
@@ -78,6 +81,7 @@ impl ReadInfo {
         let is_filtered = info[8].parse::<char>().map_err(|_| "Failed to parse read_number")?;
         let control_number = info[9].parse::<usize>().map_err(|_| "Failed to parse read_number")?;
 
+        // put info into new struct
         Ok(ReadInfo{
             instrument: info[0].to_string(),
             run,
@@ -108,12 +112,15 @@ impl ReadInfo {
         println!("Kontrollbits: {}", self.control_number);
         println!("Indexsequenz: {}", self.index);
     }
+    
 }
 
 pub fn info_data(data: &mut String){
 
+    // First we split the File name into its parts
     match split_data(data, DATA_PATTERN) {
         Ok(info) => {
+            // We create a new struct and display it
             match DataInfo::new(info) {
                 Ok(datainfo) => datainfo.display(),
                 Err(e) => println!("Could not display your data: {e}"),
@@ -126,12 +133,13 @@ pub fn info_data(data: &mut String){
 
 pub fn info_read(data: &mut String){
 
-    // We split our Read into its parts
+    // First we split the File name into its parts
     match split_data(data, READ_PATTERN) {
         Ok(info) => {
             match ReadInfo::new(info) {
+                //We create a new struct and display it
                 Ok(read_info) => read_info.display(),
-                Err(e) => println!("Couldnt process: {e}"),
+                Err(e) => println!("Couldnt display your read data: {e}"),
             }
         }
         Err(e) => println!("Couldnt split input name of your read: {e}"),
