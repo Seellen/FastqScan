@@ -32,9 +32,7 @@ impl DataInfo {
             barcode_sequence: info[1].to_string(),
             lane_number,
             read_number,
-            set_number,
-
-        })
+            set_number,        })
     }
 
     pub fn display(&self){
@@ -115,7 +113,7 @@ impl ReadInfo {
     
 }
 
-pub fn info_data(data: &mut String){
+pub fn info_data(data: &String){
 
     // First we split the File name into its parts
     match split_data(data, DATA_PATTERN) {
@@ -131,7 +129,7 @@ pub fn info_data(data: &mut String){
 
 }
 
-pub fn info_read(data: &mut String){
+pub fn info_read(data: &String){
 
     // First we split the File name into its parts
     match split_data(data, READ_PATTERN) {
