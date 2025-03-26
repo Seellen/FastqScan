@@ -1,5 +1,82 @@
-use regex::Regex;
+use std::path::{Path, PathBuf};
+use std::io::BufReader;
+use flate2::read::GzDecoder;
+use std::fs::File;
+use std::io;
+use std::io::Write;
 
+
+
+// Check if a file exists
+pub fn file_exists(file_path: &Path) -> io::Result<()> {
+    if !file_path.exists() {
+        return Err(io::Error::new(
+            io::ErrorKind::NotFound,
+            format!("File '{:?}' not found!", file_path),
+        ));
+    }
+    Ok(())
+}
+
+// Split a string by a regex pattern (reusable from `getinfo.rs`)
+pub fn split_data<'a>(data: &'a str, pattern: &str) -> Result<Vec<&'a str>, regex::Error> {
+    let re = regex::Regex::new(pattern)?;
+    Ok(re.split(data).collect())
+}
+
+pub fn process_fastq(file_path: PathBuf) -> BufReader<GzDecoder<File>>{
+    // open and use file
+    if !file_path.exists() {
+        panic!("File not found: {:?}", file_path);
+    }
+    let file_zip = File::open(file_path).expect("Konnte die Datei nicht öffnen");
+    let file = GzDecoder::new(file_zip); // Entpacke Gzip
+    let reader = BufReader::new(file);
+    return  reader;
+
+}
+
+pub fn ask_for_len(message: &str) -> u32{
+    println!("{message}");
+    io::stdout().flush().unwrap();  // Ensure prompt is shown
+
+    let mut choice = String::new();
+    io::stdin().read_line(&mut choice).unwrap();
+    let choice = choice.trim();
+
+    choice.parse::<u32>().unwrap()
+}
+
+// ------------------- PHRED SCORES -------------------
+pub fn avg_qual(qual_str: &[u8]) -> Option<f32> {
+    
+    if qual_str.is_empty() {
+        return None;
+    }
+    
+    let qu_sum: f32 = qual_str
+    .iter()
+    .map(|&qu| calculate_phred(qu))
+    .collect::<Option<Vec<f32>>>()?
+    .iter()
+    .sum();
+
+    Some(qu_sum/ qual_str.len() as f32)
+
+}
+
+pub fn calculate_phred(qual: u8) -> Option<f32> {
+    if (33..=126).contains(&qual) {
+        Some((qual as f32) - 33.0)
+    } else {
+        None
+    }
+}
+
+
+
+
+// --------------------------- READ/FILE INFO -------------------------
 const DATA_PATTERN: &str = r"[_\.]";
 const READ_PATTERN: &str = r"[ :\.]";
 
@@ -36,11 +113,11 @@ impl DataInfo {
     }
 
     pub fn display(&self){
-        println!("\nHier die übersicht über deine data file!");
+        println!("\nAn overview of your file!");
         println!("Name of the sample: {}", self.sample_name);
-        println!("Barcode sequence used for multiplexing: {}", self.barcode_sequence);
+        println!("Barcode sequence: {}", self.barcode_sequence);
         println!("Lane number (1 -8): {}", self.lane_number);
-        println!("Read number (either 1 or 2): {}", self.read_number);
+        println!("Read number (1 or 2): {}", self.read_number);
         println!("Set number: {}", self.set_number);
     }
 }
@@ -102,9 +179,9 @@ impl ReadInfo {
         println!("Die Lauf-ID : {}", self.run);
         println!("Flowcell-ID: {}", self.flowcell_id);
         println!("Flowcell-Lane (Spur: 1–8): {}", self.lane);
-        println!("Tile-Nummer innerhalb der Lane: {}", self.tile_number);
-        println!("X-Koordinate des Clusters: {}", self.x_pos);
-        println!("Y-Koordinate des Clusters: {}", self.y_pos);
+        println!("Tile-Nummer: {}", self.tile_number);
+        println!("X-Koordinate: {}", self.x_pos);
+        println!("Y-Koordinate: {}", self.y_pos);
         println!("Mitglied eines Paares (1 oder 2): {}", self.read);
         println!("Chastity Filter information: {}", self.is_filtered);
         println!("Kontrollbits: {}", self.control_number);
@@ -144,10 +221,4 @@ pub fn info_read(data: &String){
     }
 
 
-}
-
-// Split string based on parameters
-fn split_data<'a>(data: &'a str, pattern: &str) -> Result<Vec<&'a str>, regex::Error> {
-    let re = Regex::new(pattern)?;  // Compile the regex pattern
-    Ok(re.split(data).collect())    // Split the data and return as a Vec
 }
