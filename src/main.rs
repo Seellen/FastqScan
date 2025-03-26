@@ -1,8 +1,13 @@
-use fastq_scan::{runner::{BaseQualityPosStatistic, ReadQualityStatistic}, utils::process_fastq}; // Import from your lib
+use fastq_scan::{
+    runner::WorkflowRunner,
+    statistics::{
+        base_qual_pos_stat::BaseQualityPosStatistic,
+        read_qual_stat::ReadQualityStatistic
+    },
+    utils::process_fastq
+};
 use clap::Parser;
-use std::path::Path;
-use fastq_scan::runner::WorkflowRunner;
-use std::path::PathBuf;
+use std::path::{Path,PathBuf};
 
 #[derive(Parser)]
 #[derive(Debug)]
