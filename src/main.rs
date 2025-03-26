@@ -1,8 +1,7 @@
 use fastq_scan::{
     runner::WorkflowRunner,
     statistics::{
-        base_qual_pos_stat::BaseQualityPosStatistic,
-        read_qual_stat::ReadQualityStatistic
+        base_qual_pos_stat::BaseQualityPosStatistic, nuc_table::NucTable, read_qual_stat::ReadQualityStatistic
     },
     utils::process_fastq
 };
@@ -58,7 +57,8 @@ fn main() {
     let mut runner = WorkflowRunner {
         statistics: vec![
             Box::new(BaseQualityPosStatistic::new()),
-            Box::new(ReadQualityStatistic::new())
+            Box::new(ReadQualityStatistic::new()),
+            Box::new(NucTable::new()),
         ],
     };
 
