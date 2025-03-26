@@ -1,5 +1,5 @@
-use crate::runner::{Statistic, FastqRecord};
-use crate::utils::calculate_phred;
+use crate::runner::{FastqRecord, Statistic};
+use crate::utils::{ask_for_len, calculate_phred};
 use gnuplot::AxesCommon;
 use gnuplot::Figure;
 
@@ -37,18 +37,57 @@ impl Statistic for ReadQualityStatistic {
         let read_nr: Vec<usize> = (0..self.mean.len()).collect(); // X-axis: positions
         let qual_values = &self.mean; // Y-axis: quality scores
 
-        let mut fg = Figure::new();
-        fg.axes2d()
-            .set_title("Avg Quality per Read", &[])
-            .set_x_label("Position", &[])
-            .set_y_label("Average Quality Score", &[])
-            .lines(
-                qual_values,
-                read_nr,
-                &[gnuplot::Caption("Avg Quality"), gnuplot::Color("blue")],
-            );
+        println!("\nPlotting the average quality per read");
 
-        fg.show().unwrap(); // Display the plot
+        let start = match ask_for_len("\n   Input start position if desired: "){
+            Ok(num) => num,
+            Err(_) => {
+                println!("\tInvalid start position starting at 0\n");
+                0
+            },
+        };
+
+        let end = match ask_for_len("   Input end position if desired: "){
+            Ok(num) => num,
+            Err(_) => {
+                println!("\tInvalid end position ending at the last read");
+                qual_values.len() as u32 -1
+            },
+        };
+
+        let (plot_start, plot_end) = if start <= end && end < qual_values.len() as u32 {
+            (start as usize, end as usize)
+        } else {
+            println!("Invalid range, displaying full plot");
+            (0, qual_values.len()-1)
+        };
+
+        if start <= end && end < qual_values.len() as u32  {
+            let mut fg = Figure::new();
+            fg.axes2d()
+                .set_title("Avg Quality per Read", &[])
+                .set_x_label("Read Number", &[])
+                .set_y_label("Average Quality Score", &[])
+                .lines(
+                    read_nr[plot_start..plot_end].to_vec(),
+                    qual_values[plot_start..plot_end].to_vec(),
+                    &[gnuplot::Caption("Avg Quality"), gnuplot::Color("blue")],
+                );
+
+            fg.show().unwrap(); // Display the plot
+        } else {
+            let mut fg = Figure::new();
+            fg.axes2d()
+                .set_title("Avg Quality per Read", &[])
+                .set_x_label("Read Number", &[])
+                .set_y_label("Average Quality Score", &[])
+                .points(
+                    read_nr,
+                    qual_values,
+                    &[gnuplot::Caption("Avg Quality"), gnuplot::Color("blue")],
+                );
+
+            fg.show().unwrap(); // Display the plot
+        }
     }
 }
-

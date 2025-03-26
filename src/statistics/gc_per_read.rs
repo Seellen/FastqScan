@@ -30,12 +30,12 @@ impl Statistic for GcPerRead {
     }
 
     fn display(&self) {
-        println!("\nGC Content per Read:");
-        println!("{:<10} {:>10}", "Read #", "GC%");
+        // println!("\nGC Content per Read:");
+        // println!("{:<10} {:>10}", "Read #", "GC%");
         
-        for (i, gc_percent) in self.gc.iter().enumerate() {
-            println!("{:<10} {:>9.2}%", i + 1, gc_percent);
-        }
+        // for (i, gc_percent) in self.gc.iter().enumerate() {
+        //    println!("{:<10} {:>9.2}%", i + 1, gc_percent);
+        //}
     
         // Calculate and display summary statistics
         if !self.gc.is_empty() {
