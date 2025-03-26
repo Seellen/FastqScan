@@ -1,7 +1,7 @@
 use fastq_scan::{
     runner::WorkflowRunner,
     statistics::{
-        base_qual_pos_stat::BaseQualityPosStatistic, nuc_table::NucTable, read_qual_stat::ReadQualityStatistic
+        base_qual_pos_stat::BaseQualityPosStatistic, nuc_table::NucTable, read_qual_stat::ReadQualityStatistic, gc_per_read::GcPerRead
     },
     utils::process_fastq
 };
@@ -59,6 +59,7 @@ fn main() {
             Box::new(BaseQualityPosStatistic::new()),
             Box::new(ReadQualityStatistic::new()),
             Box::new(NucTable::new()),
+            Box::new(GcPerRead::new())
         ],
     };
 
