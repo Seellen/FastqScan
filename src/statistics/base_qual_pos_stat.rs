@@ -1,5 +1,3 @@
-use std::path::Display;
-
 use crate::runner::Statistic;
 use crate::runner::FastqRecord;
 use crate::utils::calculate_phred;
