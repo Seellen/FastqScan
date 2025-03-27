@@ -1,14 +1,15 @@
+use std::path::Display;
+
 use crate::runner::Statistic;
 use crate::runner::FastqRecord;
 use crate::utils::calculate_phred;
 use gnuplot::AxesCommon;
 use gnuplot::Figure;
-/// Computes mean base quality for a position read.
 
+/// Computes mean base quality for a position read.
 pub struct BaseQualityPosStatistic {
     qual_sums: Vec<f32>,
     amounts: Vec<u64>,
-    qual_avg: Vec<f32>,
 }
 
 impl BaseQualityPosStatistic {
@@ -16,7 +17,6 @@ impl BaseQualityPosStatistic {
         BaseQualityPosStatistic {
             qual_sums: Vec::new(),
             amounts: Vec::new(),
-            qual_avg: Vec::new(),
         }
     }
 }
@@ -38,18 +38,17 @@ impl Statistic for BaseQualityPosStatistic {
         }
     }
 
-    fn compute(&mut self) {
-        self.qual_avg = self
-            .qual_sums
-            .iter()
-            .zip(&self.amounts)
-            .map(|(&sum, &amount)| sum / amount as f32)
-            .collect()
-    }
-
     fn display(&self) {
-        let positions: Vec<usize> = (0..self.qual_avg.len()).collect(); // X-axis: positions
-        let qual_values = &self.qual_avg; // Y-axis: quality scores
+
+        let qual_avg: Vec<f32> = self
+        .qual_sums
+        .iter()
+        .zip(&self.amounts)
+        .map(|(&sum, &amount)| sum / amount as f32)
+        .collect();
+
+        let positions: Vec<usize> = (0..qual_avg.len()).collect(); // X-axis: positions
+        let qual_values = &qual_avg; // Y-axis: quality scores
 
         let mut fg = Figure::new();
         fg.axes2d()

@@ -3,21 +3,18 @@ use crate::runner::{Statistic,FastqRecord};
 
 pub struct NucTable {
     tab_all: Vec<CountNucleotides>,
-    tab_gc: Vec<f32>
 }
 
 impl NucTable {
     pub fn new() -> Self {
         NucTable {
             tab_all: Vec::new(),
-            tab_gc: Vec::new(), // Start empty
         }
     }
 
     fn ensure_length(&mut self, length: usize) {
         if self.tab_all.len() < length {
             self.tab_all.resize(length, CountNucleotides::new());
-            self.tab_gc.resize(length, 0.0);
         }
     }
 }
@@ -30,22 +27,24 @@ impl Statistic for NucTable {
         }
     }
 
-    fn compute(&mut self) {
+    fn display(&self) {
+
+        let mut tab_gc = Vec::new();
+        tab_gc.resize(self.tab_all.len(), 0.0);
+
         for (iter, read)in self.tab_all.iter().enumerate() {
             read.get_percentage();
-            self.tab_gc[iter] = self.tab_all[iter].get_gc_percentage();
+            tab_gc[iter] = self.tab_all[iter].get_gc_percentage();
         }
-    }
 
-    fn display(&self) {
         println!("\nNucleotide Composition:");
         println!("{:<6} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8}", 
                  "Pos", "A%", "C%", "G%", "T%", "N%", "GC%");
         
         for (i, counts) in self.tab_all.iter().enumerate() {
             let (a, c, g, t, n) = counts.get_percentage();
-            let gc_percent = if i < self.tab_gc.len() {
-                self.tab_gc[i]
+            let gc_percent = if i < tab_gc.len() {
+                tab_gc[i]
             } else {
                 0.0  // Default value if tab_gc hasn't been computed for this position
             };
@@ -63,7 +62,7 @@ impl Statistic for NucTable {
 
 
 #[derive(Debug, Clone)]
-pub struct CountNucleotides {
+struct CountNucleotides {
     a: u64,
     c: u64,
     g: u64,
@@ -114,7 +113,4 @@ impl CountNucleotides {
         return ((self.g + self.c) as f32 / total as f32) * 100.0;
     }
 
-    pub fn get_number(&self) -> (u64, u64, u64, u64, u64) {
-        (self.a, self.c, self.g, self.t, self.n)
-    }
 }

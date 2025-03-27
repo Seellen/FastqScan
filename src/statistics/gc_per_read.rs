@@ -26,9 +26,6 @@ impl Statistic for GcPerRead {
         self.gc.push(gc_count / len as f32 *100.0);
     }
 
-    fn compute(&mut self) {
-    }
-
     fn display(&self) {
         // println!("\nGC Content per Read:");
         // println!("{:<10} {:>10}", "Read #", "GC%");

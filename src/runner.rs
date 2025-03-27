@@ -18,8 +18,6 @@ pub trait Statistic {
 
     fn process(&mut self, record: &FastqRecord);
 
-    fn compute(&mut self);
-
     fn display(&self);
     // TODO - find a way to represent the results.
     // Let's try to identify the shared parts of *any* statistic
@@ -45,10 +43,6 @@ impl WorkflowRunner {
             for statistic in self.statistics.iter_mut() {
                 statistic.process(&record);
             }
-        }
-
-        for statistic in self.statistics.iter_mut() {
-            statistic.compute();
         }
 
         for statistic in self.statistics.iter() {

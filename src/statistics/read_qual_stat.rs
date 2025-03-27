@@ -31,8 +31,6 @@ impl Statistic for ReadQualityStatistic {
         };
     }
 
-    fn compute(&mut self) {}
-
     fn display(&self) {
         let read_nr: Vec<usize> = (0..self.mean.len()).collect(); // X-axis: positions
         let qual_values = &self.mean; // Y-axis: quality scores
