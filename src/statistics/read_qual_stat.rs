@@ -37,30 +37,30 @@ impl Statistic for ReadQualityStatistic {
 
         println!("\nPlotting the average quality per read");
 
-        let start = match ask_for_len("\n   Input start position if desired: "){
+        let start = match ask_for_len("\n   Input start position if desired: ") {
             Ok(num) => num,
             Err(_) => {
                 println!("\tInvalid start position starting at 0\n");
                 0
-            },
+            }
         };
 
-        let end = match ask_for_len("   Input end position if desired: "){
+        let end = match ask_for_len("   Input end position if desired: ") {
             Ok(num) => num,
             Err(_) => {
                 println!("\tInvalid end position ending at the last read");
-                qual_values.len() as u32 -1
-            },
+                qual_values.len() as u32 - 1
+            }
         };
 
         let (plot_start, plot_end) = if start <= end && end < qual_values.len() as u32 {
             (start as usize, end as usize)
         } else {
             println!("Invalid range, displaying full plot");
-            (0, qual_values.len()-1)
+            (0, qual_values.len() - 1)
         };
 
-        if start <= end && end < qual_values.len() as u32  {
+        if start <= end && end < qual_values.len() as u32 {
             let mut fg = Figure::new();
             fg.axes2d()
                 .set_title("Avg Quality per Read", &[])

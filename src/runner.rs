@@ -1,6 +1,5 @@
 use std::io::{self, BufRead};
 
-
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct FastqRecord {
     pub seq: Vec<u8>,
@@ -89,5 +88,3 @@ impl WorkflowRunner {
         self.statistics
     }
 }
-
-

@@ -1,5 +1,5 @@
-use crate::runner::Statistic;
 use crate::runner::FastqRecord;
+use crate::runner::Statistic;
 use crate::utils::calculate_phred;
 use gnuplot::AxesCommon;
 use gnuplot::Figure;
@@ -37,13 +37,12 @@ impl Statistic for BaseQualityPosStatistic {
     }
 
     fn display(&self) {
-
         let qual_avg: Vec<f32> = self
-        .qual_sums
-        .iter()
-        .zip(&self.amounts)
-        .map(|(&sum, &amount)| sum / amount as f32)
-        .collect();
+            .qual_sums
+            .iter()
+            .zip(&self.amounts)
+            .map(|(&sum, &amount)| sum / amount as f32)
+            .collect();
 
         let positions: Vec<usize> = (0..qual_avg.len()).collect(); // X-axis: positions
         let qual_values = &qual_avg; // Y-axis: quality scores

@@ -1,5 +1,4 @@
-use crate::runner::{Statistic,FastqRecord};
-
+use crate::runner::{FastqRecord, Statistic};
 
 pub struct NucTable {
     tab_all: Vec<CountNucleotides>,
@@ -28,38 +27,40 @@ impl Statistic for NucTable {
     }
 
     fn display(&self) {
-
         let mut tab_gc = Vec::new();
         tab_gc.resize(self.tab_all.len(), 0.0);
 
-        for (iter, read)in self.tab_all.iter().enumerate() {
+        for (iter, read) in self.tab_all.iter().enumerate() {
             read.get_percentage();
             tab_gc[iter] = self.tab_all[iter].get_gc_percentage();
         }
 
         println!("\nNucleotide Composition:");
-        println!("{:<6} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8}", 
-                 "Pos", "A%", "C%", "G%", "T%", "N%", "GC%");
-        
+        println!(
+            "{:<6} {:>8} {:>8} {:>8} {:>8} {:>8} {:>8}",
+            "Pos", "A%", "C%", "G%", "T%", "N%", "GC%"
+        );
+
         for (i, counts) in self.tab_all.iter().enumerate() {
             let (a, c, g, t, n) = counts.get_percentage();
             let gc_percent = if i < tab_gc.len() {
                 tab_gc[i]
             } else {
-                0.0  // Default value if tab_gc hasn't been computed for this position
+                0.0 // Default value if tab_gc hasn't been computed for this position
             };
-            println!("{:<6} {:>7.2}% {:>7.2}% {:>7.2}% {:>7.2}% {:>7.2}% {:>7.2}%",
-                     i + 1, 
-                     a * 100.0, 
-                     c * 100.0, 
-                     g * 100.0, 
-                     t * 100.0, 
-                     n * 100.0,
-                     gc_percent);
+            println!(
+                "{:<6} {:>7.2}% {:>7.2}% {:>7.2}% {:>7.2}% {:>7.2}% {:>7.2}%",
+                i + 1,
+                a * 100.0,
+                c * 100.0,
+                g * 100.0,
+                t * 100.0,
+                n * 100.0,
+                gc_percent
+            );
         }
     }
 }
-
 
 #[derive(Debug, Clone)]
 struct CountNucleotides {
@@ -105,12 +106,11 @@ impl CountNucleotides {
         )
     }
 
-    pub fn get_gc_percentage(&self) -> f32{
+    pub fn get_gc_percentage(&self) -> f32 {
         let total = self.a + self.c + self.g + self.t + self.n;
         if total == 0 {
             return 0.0;
         }
         return ((self.g + self.c) as f32 / total as f32) * 100.0;
     }
-
 }
