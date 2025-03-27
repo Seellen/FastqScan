@@ -1,5 +1,6 @@
 use crate::runner::{FastqRecord, Statistic};
 
+#[derive(Default)]
 pub struct NucTable {
     tab_all: Vec<CountNucleotides>,
 }
@@ -62,7 +63,7 @@ impl Statistic for NucTable {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 struct CountNucleotides {
     a: u64,
     c: u64,
@@ -111,6 +112,6 @@ impl CountNucleotides {
         if total == 0 {
             return 0.0;
         }
-        return ((self.g + self.c) as f32 / total as f32) * 100.0;
+        ((self.g + self.c) as f32 / total as f32) * 100.0
     }
 }

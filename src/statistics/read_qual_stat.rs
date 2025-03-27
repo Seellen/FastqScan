@@ -4,6 +4,7 @@ use gnuplot::AxesCommon;
 use gnuplot::Figure;
 
 /// Computes mean base quality for a read.
+#[derive(Default)]
 pub struct ReadQualityStatistic {
     mean: Vec<f32>,
 }
@@ -26,9 +27,7 @@ impl Statistic for ReadQualityStatistic {
         // push the mean of x
         if !x.is_empty() {
             self.mean.push(x.iter().sum::<f32>() / x.len() as f32)
-        } else {
-            ()
-        };
+        }
     }
 
     fn display(&self) {

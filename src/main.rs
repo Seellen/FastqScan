@@ -15,7 +15,6 @@ use std::path::{Path, PathBuf};
     version = "1.0",
     about = "Liest FASTQ-Dateien ein"
 )]
-
 pub struct Args {
     /// Pfad zur R1 FASTQ-Datei
     #[arg(short = '1', long)]

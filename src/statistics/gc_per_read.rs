@@ -1,5 +1,6 @@
 use crate::runner::{FastqRecord, Statistic};
 
+#[derive(Default)]
 pub struct GcPerRead {
     pub gc: Vec<f32>,
 }

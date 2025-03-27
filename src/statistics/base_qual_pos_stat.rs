@@ -5,6 +5,7 @@ use gnuplot::AxesCommon;
 use gnuplot::Figure;
 
 /// Computes mean base quality for a position read.
+#[derive(Default)]
 pub struct BaseQualityPosStatistic {
     qual_sums: Vec<f32>,
     amounts: Vec<u64>,
@@ -29,7 +30,7 @@ impl Statistic for BaseQualityPosStatistic {
 
         // Convert ASCII qualities to Phred scores and sum
         for (i, &qual) in record.qual.iter().enumerate() {
-            if let Some(phred) = calculate_phred(qual as u8) {
+            if let Some(phred) = calculate_phred(qual) {
                 self.qual_sums[i] += phred;
                 self.amounts[i] += 1;
             } // Convert ASCII to Phred

@@ -29,8 +29,7 @@ pub fn process_fastq(file_path: PathBuf) -> BufReader<GzDecoder<File>> {
     }
     let file_zip = File::open(file_path).expect("Konnte die Datei nicht öffnen");
     let file = GzDecoder::new(file_zip); // Entpacke Gzip
-    let reader = BufReader::new(file);
-    return reader;
+    BufReader::new(file)
 }
 
 pub fn ask_for_len(message: &str) -> Result<u32, String> {
@@ -207,7 +206,7 @@ impl ReadInfo {
     }
 }
 
-pub fn info_data(data: &String) {
+pub fn info_data(data: &str) {
     // First we split the File name into its parts
     match split_data(data, DATA_PATTERN) {
         Ok(info) => {
@@ -221,7 +220,7 @@ pub fn info_data(data: &String) {
     }
 }
 
-pub fn info_read(data: &String) {
+pub fn info_read(data: &str) {
     // First we split the File name into its parts
     match split_data(data, READ_PATTERN) {
         Ok(info) => {
