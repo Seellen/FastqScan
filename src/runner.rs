@@ -6,7 +6,7 @@ pub struct FastqRecord {
     pub qual: Vec<u8>,
 }
 
-pub trait Statistic {
+pub trait Statistic: Output {
     /* Statistics:
 
     * average base quality (Phred)
@@ -16,12 +16,14 @@ pub trait Statistic {
     */
 
     fn process(&mut self, record: &FastqRecord);
-
-    fn display(&self);
     // TODO - find a way to represent the results.
     // Let's try to identify the shared parts of *any* statistic
     // and report these in some fashion.
     // fn report(self) -> ?
+}
+
+pub trait Output {
+    fn out(&self);
 }
 
 pub struct WorkflowRunner {
@@ -45,7 +47,7 @@ impl WorkflowRunner {
         }
 
         for statistic in self.statistics.iter() {
-            statistic.display();
+            statistic.out();
         }
     }
 

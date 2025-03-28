@@ -1,4 +1,5 @@
 use crate::runner::FastqRecord;
+use crate::runner::Output;
 use crate::runner::Statistic;
 use crate::utils::calculate_phred;
 use gnuplot::AxesCommon;
@@ -20,24 +21,8 @@ impl BaseQualityPosStatistic {
     }
 }
 
-impl Statistic for BaseQualityPosStatistic {
-    fn process(&mut self, record: &FastqRecord) {
-        // Ensure vectors are large enough
-        if self.qual_sums.len() < record.qual.len() {
-            self.qual_sums.resize(record.qual.len(), 0.0);
-            self.amounts.resize(record.qual.len(), 0);
-        }
-
-        // Convert ASCII qualities to Phred scores and sum
-        for (i, &qual) in record.qual.iter().enumerate() {
-            if let Some(phred) = calculate_phred(qual) {
-                self.qual_sums[i] += phred;
-                self.amounts[i] += 1;
-            } // Convert ASCII to Phred
-        }
-    }
-
-    fn display(&self) {
+impl Output for BaseQualityPosStatistic {
+    fn out(&self) {
         let qual_avg: Vec<f32> = self
             .qual_sums
             .iter()
@@ -60,5 +45,23 @@ impl Statistic for BaseQualityPosStatistic {
             );
 
         fg.show().unwrap(); // Display the plot
+    }
+}
+
+impl Statistic for BaseQualityPosStatistic {
+    fn process(&mut self, record: &FastqRecord) {
+        // Ensure vectors are large enough
+        if self.qual_sums.len() < record.qual.len() {
+            self.qual_sums.resize(record.qual.len(), 0.0);
+            self.amounts.resize(record.qual.len(), 0);
+        }
+
+        // Convert ASCII qualities to Phred scores and sum
+        for (i, &qual) in record.qual.iter().enumerate() {
+            if let Some(phred) = calculate_phred(qual) {
+                self.qual_sums[i] += phred;
+                self.amounts[i] += 1;
+            } // Convert ASCII to Phred
+        }
     }
 }

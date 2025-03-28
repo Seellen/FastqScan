@@ -1,4 +1,4 @@
-use crate::runner::{FastqRecord, Statistic};
+use crate::runner::{FastqRecord, Output, Statistic};
 use crate::utils::{ask_for_len, calculate_phred};
 use gnuplot::AxesCommon;
 use gnuplot::Figure;
@@ -15,22 +15,8 @@ impl ReadQualityStatistic {
     }
 }
 
-impl Statistic for ReadQualityStatistic {
-    fn process(&mut self, record: &FastqRecord) {
-        // Convert quality scores and store in x
-        let x: Vec<f32> = record
-            .qual
-            .iter()
-            .filter_map(|&q| calculate_phred(q)) // Convert ASCII to Phred score
-            .collect();
-
-        // push the mean of x
-        if !x.is_empty() {
-            self.mean.push(x.iter().sum::<f32>() / x.len() as f32)
-        }
-    }
-
-    fn display(&self) {
+impl Output for ReadQualityStatistic {
+    fn out(&self) {
         let read_nr: Vec<usize> = (0..self.mean.len()).collect(); // X-axis: positions
         let qual_values = &self.mean; // Y-axis: quality scores
 
@@ -85,6 +71,22 @@ impl Statistic for ReadQualityStatistic {
                 );
 
             fg.show().unwrap(); // Display the plot
+        }
+    }
+}
+
+impl Statistic for ReadQualityStatistic {
+    fn process(&mut self, record: &FastqRecord) {
+        // Convert quality scores and store in x
+        let x: Vec<f32> = record
+            .qual
+            .iter()
+            .filter_map(|&q| calculate_phred(q)) // Convert ASCII to Phred score
+            .collect();
+
+        // push the mean of x
+        if !x.is_empty() {
+            self.mean.push(x.iter().sum::<f32>() / x.len() as f32)
         }
     }
 }

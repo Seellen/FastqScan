@@ -1,4 +1,4 @@
-use crate::runner::{FastqRecord, Statistic};
+use crate::runner::{FastqRecord, Output, Statistic};
 
 #[derive(Default)]
 pub struct NucTable {
@@ -19,15 +19,8 @@ impl NucTable {
     }
 }
 
-impl Statistic for NucTable {
-    fn process(&mut self, record: &FastqRecord) {
-        self.ensure_length(record.seq.len());
-        for (index, base) in record.seq.iter().enumerate() {
-            self.tab_all[index].add_base(*base);
-        }
-    }
-
-    fn display(&self) {
+impl Output for NucTable {
+    fn out(&self) {
         let mut tab_gc = Vec::new();
         tab_gc.resize(self.tab_all.len(), 0.0);
 
@@ -59,6 +52,15 @@ impl Statistic for NucTable {
                 n * 100.0,
                 gc_percent
             );
+        }
+    }
+}
+
+impl Statistic for NucTable {
+    fn process(&mut self, record: &FastqRecord) {
+        self.ensure_length(record.seq.len());
+        for (index, base) in record.seq.iter().enumerate() {
+            self.tab_all[index].add_base(*base);
         }
     }
 }
