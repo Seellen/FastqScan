@@ -66,11 +66,20 @@ fn main() {
         ],
     };
 
+    let mut runner2 = WorkflowRunner {
+        statistics: vec![
+            Box::new(BaseQualityPosStatistic::new()),
+            Box::new(ReadQualityStatistic::new()),
+            Box::new(NucTable::new()),
+            Box::new(GcPerRead::new()),
+        ],
+    };
+
     if r2 {
         println!("Processing Read 1...");
         runner.process(process_fastq(args.r1));
         println!("Processing Read 2...");
-        runner.process(process_fastq(args.r2.expect("File 2 not here")));
+        runner2.process(process_fastq(args.r2.expect("File 2 not here")));
     } else {
         println!("Processing Read 1...");
         runner.process(process_fastq(args.r1));

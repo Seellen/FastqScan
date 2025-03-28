@@ -33,9 +33,12 @@ impl Output for BaseQualityPosStatistic {
         let positions: Vec<usize> = (0..qual_avg.len()).collect(); // X-axis: positions
         let qual_values = &qual_avg; // Y-axis: quality scores
 
+        println!("{}", qual_avg[1]);
+
         let mut fg = Figure::new();
         fg.axes2d()
             .set_title("Base Quality per Position", &[])
+            .set_y_range(gnuplot::AutoOption::Fix(0.0), gnuplot::AutoOption::Fix(38.0))
             .set_x_label("Position", &[])
             .set_y_label("Average Quality Score", &[])
             .lines(

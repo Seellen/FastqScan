@@ -64,7 +64,7 @@ impl Output for ReadQualityStatistic {
                 .set_title("Avg Quality per Read", &[])
                 .set_x_label("Read Number", &[])
                 .set_y_label("Average Quality Score", &[])
-                .points(
+                .lines(
                     read_nr,
                     qual_values,
                     &[gnuplot::Caption("Avg Quality"), gnuplot::Color("blue")],
