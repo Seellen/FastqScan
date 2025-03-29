@@ -1,32 +1,32 @@
 use crate::runner::{FastqRecord, Output, Statistic};
 
 #[derive(Default)]
-pub struct NucTable {
-    tab_all: Vec<CountNucleotides>,
+pub struct BaseCountPerPos {
+    nuc_counts: Vec<CountNucleotides>,
 }
 
-impl NucTable {
+impl BaseCountPerPos {
     pub fn new() -> Self {
-        NucTable {
-            tab_all: Vec::new(),
+        BaseCountPerPos {
+            nuc_counts: Vec::new(),
         }
     }
 
     fn ensure_length(&mut self, length: usize) {
-        if self.tab_all.len() < length {
-            self.tab_all.resize(length, CountNucleotides::new());
+        if self.nuc_counts.len() < length {
+            self.nuc_counts.resize(length, CountNucleotides::new());
         }
     }
 }
 
-impl Output for NucTable {
+impl Output for BaseCountPerPos {
     fn out(&self) {
         let mut tab_gc = Vec::new();
-        tab_gc.resize(self.tab_all.len(), 0.0);
+        tab_gc.resize(self.nuc_counts.len(), 0.0);
 
-        for (iter, read) in self.tab_all.iter().enumerate() {
+        for (iter, read) in self.nuc_counts.iter().enumerate() {
             read.get_percentage();
-            tab_gc[iter] = self.tab_all[iter].get_gc_percentage();
+            tab_gc[iter] = self.nuc_counts[iter].get_gc_percentage();
         }
 
         println!("\nNucleotide Composition:");
@@ -35,7 +35,7 @@ impl Output for NucTable {
             "Pos", "A%", "C%", "G%", "T%", "N%", "GC%"
         );
 
-        for (i, counts) in self.tab_all.iter().enumerate() {
+        for (i, counts) in self.nuc_counts.iter().enumerate() {
             let (a, c, g, t, n) = counts.get_percentage();
             let gc_percent = if i < tab_gc.len() {
                 tab_gc[i]
@@ -56,11 +56,11 @@ impl Output for NucTable {
     }
 }
 
-impl Statistic for NucTable {
+impl Statistic for BaseCountPerPos {
     fn process(&mut self, record: &FastqRecord) {
         self.ensure_length(record.seq.len());
         for (index, base) in record.seq.iter().enumerate() {
-            self.tab_all[index].add_base(*base);
+            self.nuc_counts[index].add_base(*base);
         }
     }
 }

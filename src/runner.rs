@@ -1,4 +1,6 @@
 use std::io::{self, BufRead};
+use std::fmt::Write;
+
 
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct FastqRecord {
@@ -23,7 +25,7 @@ pub trait Statistic: Output {
 }
 
 pub trait Output {
-    fn out(&self);
+    fn out(&self, writer: &mut dyn Write);
 }
 
 pub struct WorkflowRunner {

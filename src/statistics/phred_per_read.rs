@@ -5,17 +5,17 @@ use gnuplot::Figure;
 
 /// Computes mean base quality for a read.
 #[derive(Default)]
-pub struct ReadQualityStatistic {
+pub struct PhredPerRead {
     mean: Vec<f32>,
 }
 
-impl ReadQualityStatistic {
+impl PhredPerRead {
     pub fn new() -> Self {
-        ReadQualityStatistic { mean: Vec::new() }
+        PhredPerRead { mean: Vec::new() }
     }
 }
 
-impl Output for ReadQualityStatistic {
+impl Output for PhredPerRead {
     fn out(&self) {
         let read_nr: Vec<usize> = (0..self.mean.len()).collect(); // X-axis: positions
         let qual_values = &self.mean; // Y-axis: quality scores
@@ -75,7 +75,7 @@ impl Output for ReadQualityStatistic {
     }
 }
 
-impl Statistic for ReadQualityStatistic {
+impl Statistic for PhredPerRead {
     fn process(&mut self, record: &FastqRecord) {
         // Convert quality scores and store in x
         let x: Vec<f32> = record

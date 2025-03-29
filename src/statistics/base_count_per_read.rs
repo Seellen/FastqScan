@@ -1,17 +1,17 @@
 use crate::runner::{FastqRecord, Output, Statistic};
 
 #[derive(Default)]
-pub struct GcPerRead {
+pub struct BaseCountRead {
     pub gc: Vec<f32>,
 }
 
-impl GcPerRead {
+impl BaseCountRead {
     pub fn new() -> Self {
-        GcPerRead { gc: Vec::new() }
+        BaseCountRead { gc: Vec::new() }
     }
 }
 
-impl Output for GcPerRead {
+impl Output for BaseCountRead {
     fn out(&self) {
         // Calculate and display summary statistics
         if !self.gc.is_empty() {
@@ -29,7 +29,7 @@ impl Output for GcPerRead {
     }
 }
 
-impl Statistic for GcPerRead {
+impl Statistic for BaseCountRead {
     fn process(&mut self, record: &FastqRecord) {
         let mut gc_count = 0.0;
         let len = record.seq.len();

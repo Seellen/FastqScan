@@ -2,29 +2,30 @@ use crate::runner::FastqRecord;
 use crate::runner::Output;
 use crate::runner::Statistic;
 use crate::utils::calculate_phred;
+use std::io::Write;
 use gnuplot::AxesCommon;
 use gnuplot::Figure;
 
 /// Computes mean base quality for a position read.
 #[derive(Default)]
-pub struct BaseQualityPosStatistic {
-    qual_sums: Vec<f32>,
+pub struct PhredPerPos {
+    phred_sums: Vec<f32>,
     amounts: Vec<u64>,
 }
 
-impl BaseQualityPosStatistic {
+impl PhredPerPos {
     pub fn new() -> Self {
-        BaseQualityPosStatistic {
-            qual_sums: Vec::new(),
+        PhredPerPos {
+            phred_sums: Vec::new(),
             amounts: Vec::new(),
         }
     }
 }
 
-impl Output for BaseQualityPosStatistic {
-    fn out(&self) {
+impl Output for PhredPerPos {
+    fn out(&self, writer: &mut dyn Write) {
         let qual_avg: Vec<f32> = self
-            .qual_sums
+            .phred_sums
             .iter()
             .zip(&self.amounts)
             .map(|(&sum, &amount)| sum / amount as f32)
@@ -51,18 +52,18 @@ impl Output for BaseQualityPosStatistic {
     }
 }
 
-impl Statistic for BaseQualityPosStatistic {
+impl Statistic for PhredPerPos {
     fn process(&mut self, record: &FastqRecord) {
         // Ensure vectors are large enough
-        if self.qual_sums.len() < record.qual.len() {
-            self.qual_sums.resize(record.qual.len(), 0.0);
+        if self.phred_sums.len() < record.qual.len() {
+            self.phred_sums.resize(record.qual.len(), 0.0);
             self.amounts.resize(record.qual.len(), 0);
         }
 
         // Convert ASCII qualities to Phred scores and sum
         for (i, &qual) in record.qual.iter().enumerate() {
             if let Some(phred) = calculate_phred(qual) {
-                self.qual_sums[i] += phred;
+                self.phred_sums[i] += phred;
                 self.amounts[i] += 1;
             } // Convert ASCII to Phred
         }
