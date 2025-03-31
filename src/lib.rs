@@ -5,6 +5,4 @@ pub mod utils;
 
 // Re-export important types for easier importing
 pub use runner::{FastqRecord, Statistic, WorkflowRunner};
-pub use statistics::{
-    base_qual_pos_stat::BaseQualityPosStatistic, read_qual_stat::ReadQualityStatistic,
-};
+pub use statistics::{phred_per_pos::PhredPerPos, phred_per_read::PhredPerRead};

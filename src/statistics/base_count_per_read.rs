@@ -1,6 +1,8 @@
-use crate::runner::{FastqRecord, Output, Statistic};
+use serde::{Deserialize, Serialize};
 
-#[derive(Default)]
+use crate::runner::{FastqRecord, Statistic};
+
+#[derive(Default, Serialize, Deserialize)]
 pub struct BaseCountRead {
     pub gc: Vec<f32>,
 }
@@ -9,10 +11,8 @@ impl BaseCountRead {
     pub fn new() -> Self {
         BaseCountRead { gc: Vec::new() }
     }
-}
 
-impl Output for BaseCountRead {
-    fn out(&self) {
+    fn _out(&self) {
         // Calculate and display summary statistics
         if !self.gc.is_empty() {
             let min = self.gc.iter().fold(f32::INFINITY, |a, &b| a.min(b));
@@ -29,6 +29,7 @@ impl Output for BaseCountRead {
     }
 }
 
+#[typetag::serde]
 impl Statistic for BaseCountRead {
     fn process(&mut self, record: &FastqRecord) {
         let mut gc_count = 0.0;

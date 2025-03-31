@@ -2,12 +2,15 @@ use clap::Parser;
 use fastq_scan::{
     runner::WorkflowRunner,
     statistics::{
-        base_qual_pos_stat::BaseQualityPosStatistic, gc_per_read::GcPerRead, nuc_table::NucTable,
-        read_qual_stat::ReadQualityStatistic,
+        base_count_per_pos::BaseCountPerPos, base_count_per_read::BaseCountRead,
+        phred_per_pos::PhredPerPos, phred_per_read::PhredPerRead, read_data::ReadData,
     },
     utils::process_fastq,
 };
-use std::path::{Path, PathBuf};
+use std::{
+    fs::File,
+    path::{Path, PathBuf},
+};
 
 #[derive(Parser, Debug)]
 #[command(
@@ -25,78 +28,52 @@ pub struct Args {
     pub r2: Option<PathBuf>,
 }
 
-fn main() {
-    // let args = Args::parse();
-    let args: Args = Args {
-        r1: "data/example.R1.fastq.gz".trim_matches('"').into(),
-        r2: Some("data/example.R2.fastq.gz".trim_matches('"').into()),
-    };
-    //let mut r1 = false;
-    let mut r2 = false;
+//let args: Args = Args {
+//    r1: "data/example.R1.fastq.gz".trim_matches('"').into(),
+//    r2: Some("data/example.R2.fastq.gz".trim_matches('"').into()),
+//};
 
-    // ---- READ 1 -----
-    // Check if the File exists
-    if !Path::new(&args.r1).exists() {
-        eprintln!("Fehler: Die R1-Datei '{:?}' existiert nicht!", args.r1);
+//let file = File::create("output.json").expect("Unable to create file");
+//let mut json_writer: Serializer<_, serde_json::ser::PrettyFormatter<'_>> =  Serializer::pretty(file);
+
+fn main() {
+    let args = Args::parse();
+
+    process_file(&args.r1, 1);
+    if let Some(read2_path) = args.r2 {
+        process_file(&read2_path, 2);
+    }
+}
+
+fn process_file(path: &PathBuf, number: u8) {
+    if !Path::new(path).exists() {
+        eprintln!("Fehler: Die Read{} '{:?}' existiert nicht!", number, path);
         std::process::exit(1);
     } else {
-        println!("\nR1-Datei: {:?}", args.r1);
-        //    r1 = true;
+        println!("\nRead{} -Datei: {:?}", number, path);
     }
 
-    // ---- READ 2 -----
-    if let Some(r_2) = &args.r2 {
-        // Check if File exists
-        if !Path::new(&r_2).exists() {
-            eprintln!("Fehler: Die R2-Datei '{:?}' existiert nicht!", r_2);
-            std::process::exit(1);
-        }
-        println!("\nR2-Datei: {:?}", r_2);
-        r2 = true;
-    } else {
-        println!("Nur Single-End Datei angegeben.");
-    }
+    println!("Processing {:?}...", path);
 
-    let mut runner = WorkflowRunner {
+    let mut runn = WorkflowRunner {
         statistics: vec![
-            Box::new(BaseQualityPosStatistic::new()),
-            Box::new(ReadQualityStatistic::new()),
-            Box::new(NucTable::new()),
-            Box::new(GcPerRead::new()),
+            Box::new(BaseCountPerPos::new()),
+            Box::new(BaseCountRead::new()),
+            Box::new(PhredPerPos::new()),
+            Box::new(PhredPerRead::new()),
+            Box::new(ReadData::new()),
         ],
     };
 
-    let mut runner2 = WorkflowRunner {
-        statistics: vec![
-            Box::new(BaseQualityPosStatistic::new()),
-            Box::new(ReadQualityStatistic::new()),
-            Box::new(NucTable::new()),
-            Box::new(GcPerRead::new()),
-        ],
-    };
+    runn.process(process_fastq(path.to_path_buf()));
+    println!("Read has been processed! Printing to file...");
 
-    if r2 {
-        println!("Processing Read 1...");
-        runner.process(process_fastq(args.r1));
-        println!("Processing Read 2...");
-        runner2.process(process_fastq(args.r2.expect("File 2 not here")));
-    } else {
-        println!("Processing Read 1...");
-        runner.process(process_fastq(args.r1));
-    }
+    // get statistics back
+    let stats = runn.finalize();
 
-    /*
-    main_menu(args,r1,r2);
+    // Create output file
+    let mut file = File::create(format!("output{}.json", number)).expect("Unable to create file");
 
-    // We dont want annoying warnings
-    if false {
-
-        getinfo::info_data(&"test".to_string());
-        getinfo::info_data(&"test2".to_string());
-
-        calls::phred_call();
-
-        calls::info_call();
-    }
-    */
+    // Serialize the statistics to Json
+    serde_json::to_writer_pretty(&mut file, &stats).expect("Failed to write to Json");
 }

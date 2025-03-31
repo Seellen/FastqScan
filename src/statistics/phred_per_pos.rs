@@ -1,13 +1,13 @@
 use crate::runner::FastqRecord;
-use crate::runner::Output;
 use crate::runner::Statistic;
 use crate::utils::calculate_phred;
-use std::io::Write;
 use gnuplot::AxesCommon;
 use gnuplot::Figure;
+use serde::Deserialize;
+use serde::Serialize;
 
 /// Computes mean base quality for a position read.
-#[derive(Default)]
+#[derive(Default, Serialize, Deserialize)]
 pub struct PhredPerPos {
     phred_sums: Vec<f32>,
     amounts: Vec<u64>,
@@ -20,10 +20,8 @@ impl PhredPerPos {
             amounts: Vec::new(),
         }
     }
-}
 
-impl Output for PhredPerPos {
-    fn out(&self, writer: &mut dyn Write) {
+    fn _out(&self) {
         let qual_avg: Vec<f32> = self
             .phred_sums
             .iter()
@@ -39,7 +37,10 @@ impl Output for PhredPerPos {
         let mut fg = Figure::new();
         fg.axes2d()
             .set_title("Base Quality per Position", &[])
-            .set_y_range(gnuplot::AutoOption::Fix(0.0), gnuplot::AutoOption::Fix(38.0))
+            .set_y_range(
+                gnuplot::AutoOption::Fix(0.0),
+                gnuplot::AutoOption::Fix(38.0),
+            )
             .set_x_label("Position", &[])
             .set_y_label("Average Quality Score", &[])
             .lines(
@@ -52,6 +53,7 @@ impl Output for PhredPerPos {
     }
 }
 
+#[typetag::serde]
 impl Statistic for PhredPerPos {
     fn process(&mut self, record: &FastqRecord) {
         // Ensure vectors are large enough

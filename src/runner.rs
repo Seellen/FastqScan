@@ -1,6 +1,4 @@
 use std::io::{self, BufRead};
-use std::fmt::Write;
-
 
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct FastqRecord {
@@ -8,7 +6,8 @@ pub struct FastqRecord {
     pub qual: Vec<u8>,
 }
 
-pub trait Statistic: Output {
+#[typetag::serde(tag = "type")]
+pub trait Statistic {
     /* Statistics:
 
     * average base quality (Phred)
@@ -22,10 +21,6 @@ pub trait Statistic: Output {
     // Let's try to identify the shared parts of *any* statistic
     // and report these in some fashion.
     // fn report(self) -> ?
-}
-
-pub trait Output {
-    fn out(&self, writer: &mut dyn Write);
 }
 
 pub struct WorkflowRunner {
@@ -48,9 +43,9 @@ impl WorkflowRunner {
             }
         }
 
-        for statistic in self.statistics.iter() {
-            statistic.out();
-        }
+        //for statistic in self.statistics.iter() {
+        //    statistic.out(writer: );
+        //}
     }
 
     // Read data for a complete FASTQ record from `read`.

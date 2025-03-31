@@ -1,10 +1,11 @@
-use crate::runner::{FastqRecord, Output, Statistic};
+use crate::runner::{FastqRecord, Statistic};
 use crate::utils::{ask_for_len, calculate_phred};
 use gnuplot::AxesCommon;
 use gnuplot::Figure;
+use serde::{Deserialize, Serialize};
 
 /// Computes mean base quality for a read.
-#[derive(Default)]
+#[derive(Default, Serialize, Deserialize)]
 pub struct PhredPerRead {
     mean: Vec<f32>,
 }
@@ -13,10 +14,8 @@ impl PhredPerRead {
     pub fn new() -> Self {
         PhredPerRead { mean: Vec::new() }
     }
-}
 
-impl Output for PhredPerRead {
-    fn out(&self) {
+    fn _out(&self) {
         let read_nr: Vec<usize> = (0..self.mean.len()).collect(); // X-axis: positions
         let qual_values = &self.mean; // Y-axis: quality scores
 
@@ -75,6 +74,7 @@ impl Output for PhredPerRead {
     }
 }
 
+#[typetag::serde]
 impl Statistic for PhredPerRead {
     fn process(&mut self, record: &FastqRecord) {
         // Convert quality scores and store in x

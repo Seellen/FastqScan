@@ -1,4 +1,5 @@
-pub mod base_qual_pos_stat;
-pub mod gc_per_read;
-pub mod nuc_table;
-pub mod read_qual_stat;
+pub mod base_count_per_pos;
+pub mod base_count_per_read;
+pub mod phred_per_pos;
+pub mod phred_per_read;
+pub mod read_data;
