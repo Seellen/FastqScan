@@ -43,14 +43,16 @@ fn main() {
     if let Some(read2_path) = args.r2 {
         process_file(&read2_path, 2);
     }
+
+    println!("\n\nFertig. Exiting now!");
 }
 
 fn process_file(path: &PathBuf, number: u8) {
     if !Path::new(path).exists() {
-        eprintln!("Fehler: Die Read{} '{:?}' existiert nicht!", number, path);
+        eprintln!("Fehler: Die Read{}-'{:?}' existiert nicht!", number, path);
         std::process::exit(1);
     } else {
-        println!("\nRead{} -Datei: {:?}", number, path);
+        println!("\nRead{}-Datei: {:?}", number, path);
     }
 
     println!("Processing {:?}...", path);
@@ -76,4 +78,6 @@ fn process_file(path: &PathBuf, number: u8) {
 
     // Serialize the statistics to Json
     serde_json::to_writer_pretty(&mut file, &stats).expect("Failed to write to Json");
+
+    println!("Finished printing to file output{}.json", number);
 }
