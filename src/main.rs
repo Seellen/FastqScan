@@ -28,17 +28,11 @@ pub struct Args {
     pub r2: Option<PathBuf>,
 }
 
-//let args: Args = Args {
-//    r1: "data/example.R1.fastq.gz".trim_matches('"').into(),
-//    r2: Some("data/example.R2.fastq.gz".trim_matches('"').into()),
-//};
-
-//let file = File::create("output.json").expect("Unable to create file");
-//let mut json_writer: Serializer<_, serde_json::ser::PrettyFormatter<'_>> =  Serializer::pretty(file);
-
 fn main() {
+    // Parse command line arguments
     let args = Args::parse();
 
+    // Calling for Arg 1 and possibly Arg2
     process_file(&args.r1, 1);
     if let Some(read2_path) = args.r2 {
         process_file(&read2_path, 2);
@@ -48,6 +42,7 @@ fn main() {
 }
 
 fn process_file(path: &PathBuf, number: u8) {
+    // Check if the file exists
     if !Path::new(path).exists() {
         eprintln!("Fehler: Die Read{}-'{:?}' existiert nicht!", number, path);
         std::process::exit(1);
@@ -55,8 +50,7 @@ fn process_file(path: &PathBuf, number: u8) {
         println!("\nRead{}-Datei: {:?}", number, path);
     }
 
-    println!("Processing {:?}...", path);
-
+    // Create the runner
     let mut runn = WorkflowRunner {
         statistics: vec![
             Box::new(BaseCountPerPos::new()),
@@ -67,7 +61,10 @@ fn process_file(path: &PathBuf, number: u8) {
         ],
     };
 
+    // Process the FASTQ file
+    println!("Processing {:?}...", path);
     runn.process(process_fastq(path.to_path_buf()));
+
     println!("Read has been processed! Printing to file...");
 
     // get statistics back

@@ -31,9 +31,11 @@ impl BaseCountRead {
 
 #[typetag::serde]
 impl Statistic for BaseCountRead {
+    // Processes a FastqRecord to calculate GC content.
     fn process(&mut self, record: &FastqRecord) {
         let mut gc_count = 0.0;
         let len = record.seq.len();
+        // Iterate over the sequence and count G and C bases
         for base in record.seq.iter() {
             match base {
                 b'C' => gc_count += 1.0,

@@ -8,12 +8,15 @@ pub struct BaseCountPerPos {
 }
 
 impl BaseCountPerPos {
+    // Creates a new instance of BaseCountPerPos.
     pub fn new() -> Self {
         BaseCountPerPos {
             nuc_counts: Vec::new(),
         }
     }
 
+    // Ensures the length of the nuc_counts vector is at least the specified length.
+    // If the vector is shorter, it resizes it and initializes new elements.
     fn ensure_length(&mut self, length: usize) {
         if self.nuc_counts.len() < length {
             self.nuc_counts.resize(length, CountNucleotides::new());
@@ -59,7 +62,9 @@ impl BaseCountPerPos {
 #[typetag::serde]
 impl Statistic for BaseCountPerPos {
     fn process(&mut self, record: &FastqRecord) {
+        // Ensure the nuc_counts vector is long enough to accommodate the current sequence length
         self.ensure_length(record.seq.len());
+        // Iterate over the sequence and update the nucleotide counts
         for (index, base) in record.seq.iter().enumerate() {
             self.nuc_counts[index].add_base(*base);
         }

@@ -62,12 +62,12 @@ impl Statistic for PhredPerPos {
             self.amounts.resize(record.qual.len(), 0);
         }
 
-        // Convert ASCII qualities to Phred scores and sum
+        // Iterate over the quality scores and update sums and counts
         for (i, &qual) in record.qual.iter().enumerate() {
             if let Some(phred) = calculate_phred(qual) {
                 self.phred_sums[i] += phred;
                 self.amounts[i] += 1;
-            } // Convert ASCII to Phred
+            }
         }
     }
 }
